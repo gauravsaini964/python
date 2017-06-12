@@ -18,20 +18,19 @@ def Pop(value):
 
 
 
-s = "aaabbaaaddcaacc"
+s = raw_input("enter characters")
 len1 = len(s)
 stack = []
-StackSize = len1/2
+StackSize = len1
 
 
 if len(stack) <= 0:
      for i in range(0,len1-1):
-         if s[i] == s[i+1]:
-             if s[i] not in stack:
-                 Push(s[i])
-                 print  "Element added: " +s[i]
-             else:
-                 print "Element already exist: " +s[i]
+         if s[i] not in stack:
+            Push(s[i])
+            print  "Element added: " +s[i]
+         else:
+            print "Element already exist: " +s[i]
 
 DisplayStack()
 
