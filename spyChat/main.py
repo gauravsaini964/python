@@ -1,43 +1,55 @@
-spy_name=raw_input("What's your name?: ")
-string_length=len(spy_name)
+import startchat
+from spydetails import spy
 
-if(string_length<=0):
-    print("name cant be blank")
-    exit()
+question = "Continue as guest Y/N"
+existing = raw_input(question)
+
+if existing.upper() == "Y":
+    print "Welcome %s.%s of age:%d has rating of %.2f" %(spy['salutation'],spy['name'],
+                                                         spy['age'],spy['rating'])
+    if spy['is_online'] == True:
+        print "you are online"
+        startchat.start_chat(spy)
+    else:
+        print "You are currently offline"
+
 else:
-    print()
+    spy = {'name' : '',
+           'salutation' : '',
+           'age' : 0,
+           'rating' : 0.0,
+           'is_online' : False}
 
+    spy['name'] = raw_input("Enter your spy name")
+    if len(spy['name']) > 0:
+        print 'Welcome ' + spy['name'] + '. Glad to have you here.'
+        spy['salutation'] = raw_input("Should I call you Mister or Miss?: ")
+        spy['name'] = spy['salutation'] + " " + spy['name']
 
-gender = raw_input("Mister or Mistress")
-phone_no = raw_input("What's your encrypted Phone No?")
+        print "Alright " + spy['name'] + ". I'd like to know a little bit more about you before we proceed..."
 
+        spy['age'] = raw_input("What is your age?")
+        spy['age'] = int(spy['age'])
 
-#Check Salutation
-if(gender=="mister"):
-    salutation="Mr."
-elif(gender=="Mr"):
-    salutation="Mr."
-elif(gender=="mis"):
-    salutation="Mrs"
-elif(gender=="mrs"):
-    salutation="Mrs."
+        if spy['age'] > 12 and spy['age'] < 50:
 
-#Process Age eligibilty
+            spy['rating'] = raw_input("What is your spy rating?")
+            spy['rating'] = float(spy['rating'])
 
-spy_age = raw_input("enter your age")
-if spy_age is " ":
-    print("Please enter valid age")
-    exit()
-elif 1 > 0:
-    spy_age = int(spy_age)
-    if spy_age <=12 and spy_age >= 50:
-        print("you are not eligible")
-        exit()
-else:
-    print("You are eligible"
-          "Please Continue")
+            if spy['rating'] > 4.5:
+                print 'Great ace!'
+            elif spy['rating'] > 3.5 and spy['rating'] <= 4.5:
+                print 'You are one of the good ones.'
+            elif spy['rating'] >= 2.5 and spy['rating'] <= 3.5:
+                print 'You can always do better'
+            else:
+                print 'We can always use somebody to help in the office.'
 
+            spy['is_online'] = True
+            if spy['is_online']:
+                startchat.start_chat(spy)
 
-print 'Welcome' +spy_name +'Glad you are here with us'
-print "Mobile No: " +phone_no
-print "Hi " +salutation +spy_name
+        else:
+            print 'Sorry you are not of the correct age to be a spy'
+    else:
+        print "A spy needs to have a valid name. Try again please."
