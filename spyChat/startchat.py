@@ -30,6 +30,9 @@ def start_chat (spy):
         elif menu_choice == 3:
             print 'Send a secret message'
             send_message()
+        elif menu_choice == 4:
+            print 'Read a secret message'
+            read_message()
         elif menu_choice == 6:
             show_menu = False
 
@@ -128,6 +131,10 @@ def read_message():
         "time": datetime.now(),
         "sent_by_me": False
     }
+
+    friends[sender]['chats'].append(new_chat)
+    print "Your secret message has been saved"
+
 
 
 
