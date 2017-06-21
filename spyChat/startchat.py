@@ -33,6 +33,9 @@ def start_chat (spy):
         elif menu_choice == 4:
             print 'Read a secret message'
             read_message()
+        elif menu_choice == 5:
+            print 'Read a chat history'
+            read_existing_chat()
         elif menu_choice == 6:
             show_menu = False
 
@@ -123,14 +126,14 @@ def read_message():
 
     new_chat = ChatMessages(message_pull,False)
 
-    friends[sender].chat.append(new_chat)
+    friends[sender].chats.append(new_chat)
     print "Your secret message has been saved"
 
 def read_existing_chat():
     read_for = select_friend()
     print '\n6'
     for chat in friends[read_for].chats:
-        if chat.sent_by_me:
+        if chat.was_sent_by_me:
             print '[%s] %s: %s' % (chat.time.strftime("%d %B %Y"), 'You said:', chat.message)
         else:
             print '[%s] %s said: %s' % (chat.time.strftime("%d %B %Y"), friends[read_for].name, chat.message)
