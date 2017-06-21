@@ -1,13 +1,13 @@
-
 from steganography.steganography import Steganography
 from datetime import datetime
+from spydetails import Spy, ChatMessages
 
 STATUS_DEFAULTS = ["Hey there", "Fuck you Donald Trump", 69]
 friends = []
 
 def start_chat (spy):
-    print "Authentication complete ! Welcome %s of age %d. You have spy rating of %.2f" % (spy['name'], spy['age'],
-                                                                                           spy['rating'])
+    print "Authentication complete ! Welcome %s of age %d. You have spy rating of %.2f" % (spy.name, spy.age,
+                                                                                           spy.rating)
     status_rn = None
     show_menu = True
     while show_menu:
@@ -68,24 +68,20 @@ def update_status ( status_rn ):
     return(updated_status_msg)
 
 def add_friend():
-    new_friend = {'name' : '',
-                  'salutation' : '',
-                  'age' : 0,
-                  'rating' : 0.0,
-                  'is_online' : False}
-    new_friend['name'] = raw_input("Enter friends name")
-    new_friend['salutation'] = raw_input("Are they Mr. or Ms.?: ")
+    new_friend = Spy('','',0,0.0)
+    new_friend.name = raw_input("Enter friends name")
+    new_friend.salutation = raw_input("Are they Mr. or Ms.?: ")
 
-    new_friend['name'] = new_friend['salutation'] + " " + new_friend['name']
+    new_friend.name = new_friend.salutation + " " + new_friend.name
 
-    new_friend['age'] = raw_input("Age?")
-    new_friend['age'] = int(new_friend['age'])
+    new_friend.age = raw_input("Age?")
+    new_friend.age = int(new_friend.age)
 
-    new_friend['rating'] = raw_input("Spy rating?")
-    new_friend['rating'] = float(new_friend['rating'])
-    new_friend['chats'] = []
+    new_friend.rating = raw_input("Spy rating?")
+    new_friend.rating = float(new_friend.rating)
+    new_friend.chats = []
 
-    if len(new_friend['name']) > 0 and new_friend['age'] > 12:
+    if len(new_friend.name) > 0 and new_friend.age > 12:
         friends.append(new_friend)
         print 'Friend Added!'
     else:
@@ -97,8 +93,8 @@ def select_friend():
     item_number = 0
 
     for avail_friend in friends:
-        print '%d. %s of %d age has %.2f rating' %(item_number+1,avail_friend['name'],avail_friend['age'],
-                                                   avail_friend['rating'])
+        print '%d. %s of %d age has %.2f rating' %(item_number+1,avail_friend.name,avail_friend.age,
+                                                   avail_friend.rating)
         item_number = item_number+1
 
     friend_choice = int(raw_input('Select number corresponding to friend you want to select'))
@@ -111,31 +107,33 @@ def send_message():
 
     original_image = raw_input('What is name of the image?')
     output_path = 'output.jpg'
-    text = raw_input('Enter message you want to encode')
-    Steganography.encode(original_image,output_path,text)
+    message_push = raw_input('Enter message you want to encode')
+    Steganography.encode(original_image,output_path,message_push)
 
-    new_chat = {'message' : text,
-                   'time': datetime.now(),
-                   'sent_by_me' : True}
+    new_chat = ChatMessages(message_push,True)
 
-    friends[friend_chosen]['chats'].append(new_chat)
+    friends[friend_chosen].chats.append(new_chat)
     print "Your secret message is ready!"
 
 def read_message():
     sender = select_friend()
     output_path = raw_input('What is name of the file?')
-    secret_text = Steganography.decode(output_path)
+    message_pull = Steganography.decode(output_path)
+    print message_pull
 
-    new_chat = {
-        "message": secret_text,
-        "time": datetime.now(),
-        "sent_by_me": False
-    }
+    new_chat = ChatMessages(message_pull,False)
 
-    friends[sender]['chats'].append(new_chat)
+    friends[sender].chat.append(new_chat)
     print "Your secret message has been saved"
 
-
+def read_existing_chat():
+    read_for = select_friend()
+    print '\n6'
+    for chat in friends[read_for].chats:
+        if chat.sent_by_me:
+            print '[%s] %s: %s' % (chat.time.strftime("%d %B %Y"), 'You said:', chat.message)
+        else:
+            print '[%s] %s said: %s' % (chat.time.strftime("%d %B %Y"), friends[read_for].name, chat.message)
 
 
 
