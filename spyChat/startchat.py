@@ -80,6 +80,7 @@ def add_friend():
 
     new_friend['rating'] = raw_input("Spy rating?")
     new_friend['rating'] = float(new_friend['rating'])
+    new_friend['chats'] = []
 
     if len(new_friend['name']) > 0 and new_friend['age'] > 12:
         friends.append(new_friend)
@@ -92,8 +93,9 @@ def add_friend():
 def select_friend():
     item_number = 0
 
-    for friend in friends:
-        print '%d. %s of %d age has %.2f rating' %(item_number+1,friend['name'],friend['age'],friend['rating'])
+    for avail_friend in friends:
+        print '%d. %s of %d age has %.2f rating' %(item_number+1,avail_friend['name'],avail_friend['age'],
+                                                   avail_friend['rating'])
         item_number = item_number+1
 
     friend_choice = int(raw_input('Select number corresponding to friend you want to select'))
