@@ -25,8 +25,8 @@ StackSize = len1
 
 
 if len(stack) <= 0:
-     for i in range(0,len1-1):
-         if s[i] not in stack:
+     for i in range(0,len1):
+         if stack[i] != stack [i+1] and s[i] not in stack:
             Push(s[i])
             print  "Element added: " +s[i]
          else:

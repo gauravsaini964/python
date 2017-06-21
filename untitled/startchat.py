@@ -1,10 +1,4 @@
-
-from steganography.steganography import Steganography
-from datetime import datetime
-
-STATUS_DEFAULTS = ["Hey there", "Fuck you Donald Trump", 69]
 friends = []
-
 def start_chat (spy):
     print "Authentication complete ! Welcome %s of age %d. You have spy rating of %.2f" % (spy['name'], spy['age'],
                                                                                            spy['rating'])
@@ -29,35 +23,34 @@ def start_chat (spy):
             add_friend()
         elif menu_choice == 3:
             print 'Send a secret message'
-            send_message()
+            select_friend()
         elif menu_choice == 6:
             show_menu = False
 
-
 def update_status ( status_rn ):
     updated_status_msg = None
+    STATUS_DEFAULTS = ["Hey there","Fuck you Donald Trump",69]
     if status_rn != None:
         print "Your current status message is: %s" % (status_rn) + "\n"
     else:
         print 'You don\'t have any status message currently \n'
 
-    default = raw_input("Do you want to select status from defaults? Y/N")
+    default=raw_input("Do you want to select status from defaults? Y/N")
     if default.upper() == "N":
         new_status_msg = raw_input("Enter your status")
         if len(new_status_msg) > 0:
-            updated_status_msg = new_status_msg
             STATUS_DEFAULTS.append(new_status_msg)
+            updated_status_msg = new_status_msg
 
-    elif default.upper() == 'Y':
-        item_position = 1
-        for message in STATUS_DEFAULTS:
-            print "%d.%s" %(item_position,message)
-            item_position = item_position+1
+        elif default.upper() == "Y":
+            item_position = 1
+            for message in STATUS_DEFAULTS:
+                print "%d.%s" %(item_position,message)
+                item_position = item_position+1
 
-        select_status = int(raw_input("Select number corresponding to the status you want to use"))
-        if len(STATUS_DEFAULTS) > select_status:
+            select_status = int(raw_input("Select number corresponding to the status you want to use"))
+            if len(STATUS_DEFAULTS) >= select_status:
                 updated_status_msg = STATUS_DEFAULTS[select_status - 1]
-
     else:
         print 'Please enter Y or N !'
 
@@ -100,35 +93,6 @@ def select_friend():
     friend_choice_position = friend_choice -1
 
     return (friend_choice_position)
-
-def send_message():
-    friend_chosen = select_friend()
-
-    original_image = raw_input('What is name of the image?')
-    output_path = 'output.jpg'
-    text = raw_input('Enter message you want to encode')
-    Steganography.encode(original_image,output_path,text)
-
-    new_chat = {'message' : text,
-                   'time': datetime.now(),
-                   'sent_by_me' : True}
-
-    friends[friend_chosen]['chats'].append(new_chat)
-    print "Your secret message is ready!"
-
-def read_message():
-    sender = select_friend()
-    output_path = raw_input('What is name of the file?')
-    secret_text = Steganography.decode(output_path)
-
-    new_chat = {
-        "message": secret_text,
-        "time": datetime.now(),
-        "sent_by_me": False
-    }
-
-
-
 
 
 
