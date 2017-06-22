@@ -139,7 +139,14 @@ def read_message():
         print colored("Your secret message is:%s", 'yellow', attrs=['bold']) %message_pull
 
     split = message_pull.split()
-    if len(split) > 100:
+    help_indicator = 0
+
+    for words in split:
+        if words.upper() == "SOS" or words.upper() == "SAVE ME" or words.upper() == "HELP":
+            print colored("Spy in distress  " , 'red', attrs=['bold']) + colored('~~MAYDAY~~', 'red', attrs=['blink'])
+            help_indicator = 1
+
+    if help_indicator != 1 and len(split) > 5:
         del_spy_quest = raw_input("Agent is too chatty. Do you want to delete him from friends? Y/N")
         if del_spy_quest.upper() == "Y":
             print colored("Spy:%s is being deleted from friend list", 'red', attrs=['bold']) %sender
