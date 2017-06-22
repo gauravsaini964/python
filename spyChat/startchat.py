@@ -128,7 +128,7 @@ def read_message():
     output_path = raw_input('What is name of the file?')
     message_pull = Steganography.decode(output_path)
     if message_pull == "":
-        print "Agent must be in hurry,he left no message! What might be the case?"
+        print colored("Agent must be in hurry,he left no message! What might be the case?", 'red' ,attrs=['bold'])
     else:
         new_chat = ChatMessages(message_pull, False)
         friends[sender].chats.append(new_chat)
@@ -137,6 +137,13 @@ def read_message():
     read_msg = raw_input("Do you want to display secret message? Y/N")
     if read_msg.upper() == 'Y':
         print colored("Your secret message is:%s", 'yellow', attrs=['bold']) %message_pull
+
+    split = message_pull.split()
+    if len(split) > 100:
+        del_spy_quest = raw_input("Agent is too chatty. Do you want to delete him from friends? Y/N")
+        if del_spy_quest.upper() == "Y":
+            print colored("Spy:%s is being deleted from friend list", 'red', attrs=['bold']) %sender
+            friends.pop(sender)
 
 
 def read_existing_chat():
@@ -147,3 +154,4 @@ def read_existing_chat():
             print '[%s] %s: %s' % (chat.time.strftime("%d %B %Y"), 'You said:', chat.message)
         else:
             print '[%s] %s said: %s' % (chat.time.strftime("%d %B %Y"), friends[read_for].name, chat.message)
+
