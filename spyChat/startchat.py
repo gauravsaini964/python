@@ -121,17 +121,23 @@ def send_message():
     friends[friend_chosen].chats.append(new_chat)
     print colored("\nChat message saved!\n", 'yellow', attrs = ['bold'])
 
+
+
 def read_message():
     sender = select_friend()
     output_path = raw_input('What is name of the file?')
     message_pull = Steganography.decode(output_path)
+    if message_pull == "":
+        print "Agent must be in hurry,he left no message! What might be the case?"
+    else:
+        new_chat = ChatMessages(message_pull, False)
+        friends[sender].chats.append(new_chat)
+        print "\nYour secret message has been saved\n"
+
     read_msg = raw_input("Do you want to display secret message? Y/N")
     if read_msg.upper() == 'Y':
         print colored("Your secret message is:%s", 'yellow', attrs=['bold']) %message_pull
 
-    new_chat = ChatMessages(message_pull,False)
-    friends[sender].chats.append(new_chat)
-    print "\nYour secret message has been saved\n"
 
 def read_existing_chat():
     read_for = select_friend()
@@ -141,8 +147,3 @@ def read_existing_chat():
             print '[%s] %s: %s' % (chat.time.strftime("%d %B %Y"), 'You said:', chat.message)
         else:
             print '[%s] %s said: %s' % (chat.time.strftime("%d %B %Y"), friends[read_for].name, chat.message)
-
-
-
-
-
