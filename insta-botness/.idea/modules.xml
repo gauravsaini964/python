@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/insta-botness.iml" filepath="$PROJECT_DIR$/.idea/insta-botness.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../spyChat/.idea/spyChat.iml" filepath="$PROJECT_DIR$/../spyChat/.idea/spyChat.iml" />
     </modules>
   </component>
 </project>
