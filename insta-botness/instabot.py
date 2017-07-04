@@ -1,9 +1,11 @@
 import requests
+import json
 from termcolor import colored
 
 BASE_URL = 'https://api.instagram.com/v1/'
 ACCESS_TOKEN = '229742593.0635911.5037291b10384da59a7f622e4a0e68ed'
 
+SANDBOX_USER = []
 
 
 def start_bot():
@@ -43,6 +45,7 @@ def self_info():
     request_url = (BASE_URL + 'users/self/?access_token=%s') % (ACCESS_TOKEN)
     print 'GET Access Token Owner Info : %s' % (request_url)
     user_info = requests.get(request_url).json()
+    print user_info
 
     if user_info['meta']['code'] == 200:
         if len(user_info['data']):
@@ -57,11 +60,21 @@ def self_info():
 
 
 def get_userID():
-    request_url = (BASE_URL + 'users/search?q=jack&access_token=%s') %(ACCESS_TOKEN)
+    username = raw_input("Enter instagram username of person you want to search")
+    request_url = (BASE_URL + 'users/search?q=%s&access_token=%s') %(username,ACCESS_TOKEN)
     user_info = requests.get(request_url).json()
-    print user_info
-# Waiting for sandbox invite
+    if user_info:
+        with open('user_info.json', 'w') as outfile:
+            json.dump(user_info, outfile)
+            f1 = open('user_info.json')
 
+        user_info = json.load(f1)
+        for item in user_info:
+            if item == 'data':
+                user_id = user_info['data'][0]['id']
+                print user_id
 
+    else:
+        print colored('Add user to sandbox','red',attrs=['bold'])
 
 start_bot()
