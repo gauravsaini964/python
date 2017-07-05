@@ -49,6 +49,18 @@ def get_info():
         print colored("Read own details\n", 'cyan', attrs=['bold'])
         request_url = (BASE_URL + 'users/self/?access_token=%s') % (ACCESS_TOKEN)
         user_info = requests.get(request_url).json()
+        if user_info:
+            with open('user_info.json', 'w') as outfile:
+                json.dump(user_info, outfile)
+                f1 = open('user_info.json')
+
+            user_info = json.load(f1)
+            for item in user_info:
+                if item == 'data':
+                    user_id = user_info['data']['id']
+                    SANDBOX_USER.append(user_id)
+                    return user_id
+
 
     elif select == 2:
         print colored("Get details of user using username\n", 'cyan', attrs=['bold'])
@@ -69,7 +81,7 @@ def get_info():
         else:
             print colored('User has no data','red',attrs=['bold'])
     else:
-        print colored('Server 200 ni maar rha', 'red', attrs=['bold'])
+        print colored('Data not found', 'red', attrs=['bold'])
 
     quest = raw_input('Do you want to continue with this user? Y/N')
     if quest.upper() == 'Y':
