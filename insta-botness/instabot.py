@@ -12,7 +12,7 @@ def start_bot():
     show_menu = True
     while show_menu:
         menu_choices =  menu_choices = "What do you want to do? " \
-                                       "\n 1. Read your own details" \
+                                       "\n 1. Read account details" \
                                        "\n 2. Get details of an user" \
                                        "\n 3. Send a secret message " \
                                        "\n 4. Read a secret message " \
@@ -22,11 +22,11 @@ def start_bot():
         menu_choice = int(menu_choice)
 
         if menu_choice == 1:
-            print colored("Read own details\n", 'cyan', attrs=['bold'])
-            self_info()
+            print colored("Read details\n", 'cyan', attrs=['bold'])
+            get_info()
         elif menu_choice == 2:
             print colored("Get details of user using username\n", 'cyan', attrs=['bold'])
-            get_userID()
+            get_userInfo()
         elif menu_choice == 3:
             print colored("Send a secret message\n", 'cyan', attrs=['bold'])
             send_message()
@@ -41,11 +41,23 @@ def start_bot():
 
 
 
-def self_info():
-    request_url = (BASE_URL + 'users/self/?access_token=%s') % (ACCESS_TOKEN)
-    print 'GET Access Token Owner Info : %s' % (request_url)
-    user_info = requests.get(request_url).json()
-    print user_info
+def get_info():
+    select = int(raw_input("Select user for which you want info \n"
+                           "1. Info of Access Token Owner\n"
+                           "2. Info of other user"))
+    if select ==1:
+        print colored("Read own details\n", 'cyan', attrs=['bold'])
+        request_url = (BASE_URL + 'users/self/?access_token=%s') % (ACCESS_TOKEN)
+        user_info = requests.get(request_url).json()
+
+    elif select == 2:
+        print colored("Get details of user using username\n", 'cyan', attrs=['bold'])
+        id = get_userID()
+        request_url = (BASE_URL + 'users/%s/?access_token=%s') % (id, ACCESS_TOKEN)
+        user_info = requests.get(request_url).json()
+
+    else:
+        print 'Please select a valid option.'
 
     if user_info['meta']['code'] == 200:
         if len(user_info['data']):
@@ -53,10 +65,18 @@ def self_info():
             print 'Followers:' + colored('%s', 'yellow', attrs=['bold']) % (user_info['data']['counts']['followed_by'])
             print 'Following:' + colored('%s', 'yellow', attrs=['bold']) % (user_info['data']['counts']['follows'])
             print 'Posts:' + colored('%s', 'yellow', attrs=['bold']) % (user_info['data']['counts']['media'])
+
         else:
             print colored('User has no data','red',attrs=['bold'])
     else:
         print colored('Server 200 ni maar rha', 'red', attrs=['bold'])
+
+    quest = raw_input('Do you want to continue with this user? Y/N')
+    if quest.upper() == 'Y':
+        select = int(raw_input("Select no. corresponding to action you want to perform \n"
+                               "1. Like a post\n"
+                               "2. Comment on a post\n"))
+
 
 
 def get_userID():
@@ -72,9 +92,12 @@ def get_userID():
         for item in user_info:
             if item == 'data':
                 user_id = user_info['data'][0]['id']
-                print user_id
+                SANDBOX_USER.append(user_id)
+                return user_id
+        else:
+            print colored('Add user to sandbox','red',attrs=['bold'])
 
-    else:
-        print colored('Add user to sandbox','red',attrs=['bold'])
+
+
 
 start_bot()
