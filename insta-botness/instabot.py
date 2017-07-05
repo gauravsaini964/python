@@ -15,7 +15,7 @@ def start_bot():
         menu_choices =  menu_choices = "What do you want to do? " \
                                        "\n 1. Read account details" \
                                        "\n 2. Get recent media " \
-                                       "\n 3. Send a secret message " \
+                                       "\n 3. Like it or not " \
                                        "\n 4. Read a secret message " \
                                        "\n 5. Read Chats from a user " \
                                        "\n 6. Close Application \n"
@@ -29,8 +29,8 @@ def start_bot():
             print colored("Get recent media\n", 'cyan', attrs=['bold'])
             get_recent()
         elif menu_choice == 3:
-            print colored("Send a secret message\n", 'cyan', attrs=['bold'])
-            send_message()
+            print colored("Like it or not\n", 'cyan', attrs=['bold'])
+            like_it_or_not()
         elif menu_choice == 4:
             print colored("Read a secret message\n", 'cyan', attrs=['bold'])
             read_message()
@@ -59,8 +59,10 @@ def get_info():
             for item in user_info:
                 if item == 'data':
                     user_id = user_info['data']['id']
-                    CURRENT_ID.append(user_id)
-                    return user_id
+                    user_name = user_info['data']['username']
+                    user = [user_id , user_name]
+                    CURRENT_ID.append(user)
+                    print CURRENT_ID
 
 
     elif select == 2:
@@ -105,7 +107,9 @@ def get_userID():
         for item in user_info:
             if item == 'data':
                 user_id = user_info['data'][0]['id']
-                CURRENT_ID.append(user_id)
+                user_name = user_info['data'][0]['username']
+                user = [user_id , user_name]
+                CURRENT_ID.append(user)
                 return user_id
         else:
             print colored('Add user to sandbox','red',attrs=['bold'])
@@ -115,9 +119,8 @@ def get_recent():
     if CURRENT_ID == []:
         print "Select user first"
         get_info()
+    id = CURRENT_ID[0][0]
 
-
-    id = CURRENT_ID[0]
     request_url = (BASE_URL + "users/%s/media/recent?access_token=%s") %(id,ACCESS_TOKEN)
     media = requests.get(request_url).json()
     if media:
@@ -136,6 +139,34 @@ def get_recent():
             CURRENT_MEDIA.append(media_info)
 
     return CURRENT_MEDIA[0][0]
+
+def like_it_or_not():
+
+    if CURRENT_ID == []:
+        print "Select user first"
+        media_id = get_recent()
+        print media_id
+
+    quest = int(raw_input('Select what do you want to do:\n'
+                          '1. Get no of likes on recent post.\n'
+                          '2. Like a post.\n'
+                          '3. Delete like from a post\n'))
+    if quest == 1:
+        print "Post by: %s has: %s likes" %(CURRENT_ID[0][1],CURRENT_MEDIA[0][3])
+    if quest == 2:
+        request_url = (BASE_URL + 'media/%s/likes') % (media_id)
+        payload = {"access_token": ACCESS_TOKEN}
+        post_a_like = requests.post(request_url, payload).json()
+        if post_a_like['meta']['code'] == 200:
+            print colored('Successfully liked media','yellow',attrs=['bold'])
+    if quest ==3:
+        request_url = (BASE_URL + 'media/%s/likes') % (media_id)
+        payload = {"access_token": ACCESS_TOKEN}
+        delete_a_like = requests.delete(request_url)
+        #if delete_a_like['meta']['code'] == 200:
+            #print colored('Successfully deleted like on media', 'yellow', attrs=['bold'])
+
+
 
 
 
