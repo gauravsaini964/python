@@ -5,7 +5,7 @@ from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
 
 BASE_URL = 'https://api.instagram.com/v1/'
-ACCESS_TOKEN = 'fill it'
+ACCESS_TOKEN = 'fill-it-with-yours'
 
 CURRENT_ID = []
 CURRENT_MEDIA = []
@@ -20,7 +20,6 @@ def start_bot():
                                        "\n 2. Get recent media " \
                                        "\n 3. Like it or not " \
                                        "\n 4. Comment service " \
-                                       "\n 5. Read Chats from a user " \
                                        "\n 6. Close Application \n"
         menu_choice = raw_input(menu_choices)
         menu_choice = int(menu_choice)
@@ -30,16 +29,13 @@ def start_bot():
             get_info()
         elif menu_choice == 2:
             print colored("Get recent media\n", 'cyan', attrs=['bold'])
-            get_recent()
+            media_id = get_recent()
         elif menu_choice == 3:
             print colored("Like it or not\n", 'cyan', attrs=['bold'])
             like_it_or_not()
         elif menu_choice == 4:
             print colored("Post or delete a comment\n", 'cyan', attrs=['bold'])
             post_del_comment()
-        elif menu_choice == 5:
-            print colored("Read existing message\n", 'cyan', attrs=['bold'])
-            read_existing_chat()
         elif menu_choice == 6:
             show_menu = False
 
@@ -146,11 +142,11 @@ def get_recent():
 
 def like_it_or_not():
 
+
     if CURRENT_ID == []:
         print "Select user first"
-        media_id = get_recent()
-        print media_id
 
+    media_id = get_recent()
     quest = int(raw_input('Select what do you want to do:\n'
                           '1. Get no of likes on recent post.\n'
                           '2. Like a post.\n'
@@ -164,16 +160,17 @@ def like_it_or_not():
         if post_a_like['meta']['code'] == 200:
             print colored('Successfully liked media','yellow',attrs=['bold'])
     if quest ==3:
-        request_url = (BASE_URL + 'media/%s/likes') % (media_id)
+        request_url = (BASE_URL + 'media/%s/likes?access_token=%s') % (media_id,ACCESS_TOKEN)
         payload = {"access_token": ACCESS_TOKEN}
-        delete_a_like = requests.delete(request_url)
-        #if delete_a_like['meta']['code'] == 200:
-            #print colored('Successfully deleted like on media', 'yellow', attrs=['bold'])
+        delete_a_like = requests.delete(request_url).json()
+        if delete_a_like['meta']['code'] == 200:
+            print colored('Successfully deleted like on media', 'yellow', attrs=['bold'])
 
 def post_del_comment():
     if CURRENT_ID == []:
         print "Select user first"
-        media_id = get_recent()
+
+    media_id = get_recent()
 
     quest = int(raw_input('Select what do you want to do:\n'
                           '1. Comment on recent media.\n'
@@ -191,8 +188,6 @@ def post_del_comment():
             print colored('Unable to comment: Try again', 'red', attrs=['bold'])
 
     if quest == 2:
-        print media_id
-        print 'looped'
         request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id,ACCESS_TOKEN)
         get_comment = requests.get(request_url).json()
         print get_comment
