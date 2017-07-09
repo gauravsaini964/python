@@ -6,22 +6,28 @@ from textblob.sentiments import NaiveBayesAnalyzer
 import urllib
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+from clarifai import rest
+from clarifai.rest import ClarifaiApp
+from clarifai.rest import Image as ClImage
 
 
 
 
 BASE_URL = 'https://api.instagram.com/v1/'
-ACCESS_TOKEN = 'fill it with urs'
+ACCESS_TOKEN = 'fill-it-with yours'
 
 CURRENT_ID = []
 CURRENT_MEDIA = []
 TREND_ANALYSIS_ID = []
 TREND_ANALYSIS_TAGS = []
+IMAGE_NAME = []
+IMAGE_TAGS = []
 
 
 
 
 def start_bot():
+
     show_menu = True
     while show_menu:
         menu_choices =  menu_choices = "What do you want to do? " \
@@ -53,7 +59,9 @@ def start_bot():
 
 
 
+
 def get_info():
+
     select = int(raw_input("Select user for which you want info \n"
                            "1. Info of Access Token Owner\n"
                            "2. Info of other user"))
@@ -73,8 +81,6 @@ def get_info():
                     user_name = user_info['data']['username']
                     user = [user_id , user_name]
                     CURRENT_ID.append(user)
-
-
 
     elif select == 2:
         print colored("Get details of user using username\n", 'cyan', attrs=['bold'])
@@ -97,15 +103,11 @@ def get_info():
     else:
         print colored('Data not found', 'red', attrs=['bold'])
 
-#    quest = raw_input('Do you want to continue with this user? Y/N')
-#    if quest.upper() == 'Y':
-#        select = int(raw_input("Select no. corresponding to action you want to perform \n"
-#                               "1. Like a post\n"
-#                               "2. Comment on a post\n"))
 
 
 
 def get_userID():
+
     username = raw_input("Enter instagram username of person you want to search")
     request_url = (BASE_URL + 'users/search?q=%s&access_token=%s') %(username,ACCESS_TOKEN)
     user_info = requests.get(request_url).json()
@@ -126,7 +128,10 @@ def get_userID():
             print colored('Add user to sandbox','red',attrs=['bold'])
 
 
+
+
 def get_recent():
+
     if CURRENT_ID == []:
         print "Select user first"
         get_info()
@@ -152,8 +157,10 @@ def get_recent():
 
     return id
 
-def like_it_or_not():
 
+
+
+def like_it_or_not():
 
     if CURRENT_ID == []:
         print "Select user first"
@@ -178,7 +185,11 @@ def like_it_or_not():
         if delete_a_like['meta']['code'] == 200:
             print colored('Successfully deleted like on media', 'yellow', attrs=['bold'])
 
+
+
+
 def post_del_comment():
+
     if CURRENT_ID == []:
         print "Select user first"
 
@@ -230,7 +241,10 @@ def post_del_comment():
                 print 'Status code other than 200 recieved'
 
 
+
+
 def trend_analysis():
+
     print colored('For proper trend analysis we need some base data.\n'
                   'Please enter at-least 5 sandbox-username to collect data.\n', 'red', attrs=['bold'])
     keep_loop_on = True
@@ -242,6 +256,7 @@ def trend_analysis():
             TREND_ANALYSIS_ID.append(id)
         if question.upper() == 'N':
             print 'Following Instagram User-ID were added for trend analysis'
+            print colored(TREND_ANALYSIS_ID,'yellow',attrs=['bold'])
             keep_loop_on = False
 
     for item in range (0,len(TREND_ANALYSIS_ID)):
@@ -255,7 +270,9 @@ def trend_analysis():
                     for hashtags in user_media['data'][x]['tags']:
                         TREND_ANALYSIS_TAGS.append(hashtags)
 
+
                 image_name = user_media['data'][0]['id'] + '.jpeg'
+                IMAGE_NAME.append(image_name)
                 image_url = user_media['data'][0]['images']['standard_resolution']['url']
                 urllib.urlretrieve(image_url,image_name)
                 print 'Image is downloaded'
@@ -263,11 +280,24 @@ def trend_analysis():
                 print 'Post does not exist'
         else:
             print 'Status code other than 200 recieved'
-    generate_wordcloud()
+    tags = " ".join(TREND_ANALYSIS_TAGS)
 
-def generate_wordcloud():
+    quest = raw_input('What do you want to analyse?\n'
+            '1. Analyse trend based on #hashtags\n'
+            '2. Analyse trend based on image analysis\n')
+    question = int(quest)
+    if question == 1:
+        generate_wordcloud(tags)
+    elif question == 2:
+        image_analyser()
+    else:
+        print 'Please select a valid option'
 
-    cloud_text = " ".join(TREND_ANALYSIS_TAGS)
+
+
+
+def generate_wordcloud(cloud_text):
+
     wordcloud = WordCloud(background_color='white',
                           width=1080,
                           height=1920).generate(cloud_text)
@@ -278,4 +308,27 @@ def generate_wordcloud():
     plt.show()
 
 
-start_bot()
+
+
+def image_analyser():
+
+    for item in range(0,len(IMAGE_NAME)):
+        temp_image = IMAGE_NAME[item]
+        app = ClarifaiApp(api_key='b8d5ac3be8e94320960ce9bb039176a7')
+        model = app.models.get("general-v1.3")
+        image = ClImage(file_obj=open(temp_image, 'rb'))
+        result = model.predict([image])
+        if result:
+            with open('clarifai_result.json', 'w') as outfile3:
+                json.dump(result, outfile3)
+                f3 = open('clarifai_result.json')
+            result = json.load(f3)
+            for x in range(0,len(result['outputs'][0]['data']['concepts'])):
+                model = result['outputs'][0]['data']['concepts'][x]['name']
+                IMAGE_TAGS.append(model)
+
+    tags = " ".join(IMAGE_TAGS)
+    generate_wordcloud(tags)
+
+
+
