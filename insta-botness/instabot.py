@@ -3,12 +3,21 @@ import json
 from termcolor import colored
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
+import urllib
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
+
+
 
 BASE_URL = 'https://api.instagram.com/v1/'
-ACCESS_TOKEN = 'fill-it-with-yours'
+ACCESS_TOKEN = 'fill it with urs'
 
 CURRENT_ID = []
 CURRENT_MEDIA = []
+TREND_ANALYSIS_ID = []
+TREND_ANALYSIS_TAGS = []
+
 
 
 
@@ -20,6 +29,7 @@ def start_bot():
                                        "\n 2. Get recent media " \
                                        "\n 3. Like it or not " \
                                        "\n 4. Comment service " \
+                                       "\n 5. Trend Analysis" \
                                        "\n 6. Close Application \n"
         menu_choice = raw_input(menu_choices)
         menu_choice = int(menu_choice)
@@ -36,6 +46,8 @@ def start_bot():
         elif menu_choice == 4:
             print colored("Post or delete a comment\n", 'cyan', attrs=['bold'])
             post_del_comment()
+        elif menu_choice == 5:
+            trend_analysis()
         elif menu_choice == 6:
             show_menu = False
 
@@ -216,6 +228,54 @@ def post_del_comment():
                     print 'There are no existing comments on the post'
             else:
                 print 'Status code other than 200 recieved'
+
+
+def trend_analysis():
+    print colored('For proper trend analysis we need some base data.\n'
+                  'Please enter at-least 5 sandbox-username to collect data.\n', 'red', attrs=['bold'])
+    keep_loop_on = True
+
+    while keep_loop_on:
+        question = raw_input('Do you want to add more ID for trend analysis?Y/N')
+        if question.upper() == 'Y':
+            id = get_userID()
+            TREND_ANALYSIS_ID.append(id)
+        if question.upper() == 'N':
+            print 'Following Instagram User-ID were added for trend analysis'
+            keep_loop_on = False
+
+    for item in range (0,len(TREND_ANALYSIS_ID)):
+        temp_id = TREND_ANALYSIS_ID[item]
+        request_url = (BASE_URL+'users/%s/media/recent/?access_token=%s') % (temp_id,ACCESS_TOKEN)
+        user_media = requests.get(request_url).json()
+
+        if user_media['meta']['code'] == 200:
+            if len(user_media['data']):
+                for x in range(0, len(user_media['data'])):
+                    for hashtags in user_media['data'][x]['tags']:
+                        TREND_ANALYSIS_TAGS.append(hashtags)
+
+                image_name = user_media['data'][0]['id'] + '.jpeg'
+                image_url = user_media['data'][0]['images']['standard_resolution']['url']
+                urllib.urlretrieve(image_url,image_name)
+                print 'Image is downloaded'
+            else:
+                print 'Post does not exist'
+        else:
+            print 'Status code other than 200 recieved'
+    generate_wordcloud()
+
+def generate_wordcloud():
+
+    cloud_text = " ".join(TREND_ANALYSIS_TAGS)
+    wordcloud = WordCloud(background_color='white',
+                          width=1080,
+                          height=1920).generate(cloud_text)
+    plt.figure()
+    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.axis("off")
+    plt.savefig('cloud.png')
+    plt.show()
 
 
 start_bot()
